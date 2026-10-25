@@ -26,6 +26,7 @@ Lefthook runs them before commits and builds every package before pushes. CI run
 
 - Changes reach `main` through squash-merged pull requests, and the pull request title becomes the commit. CI requires titles to follow [Conventional Commits](https://www.conventionalcommits.org), scoped by the packages they affect: `feat(mdpaper): add a template option`, `fix(mdpaper,other): share date parsing`. Changes outside `packages/` have no scope: `ci: cache dependencies`.
 - Package releases follow from those titles; see each package's README.
+- The pull request description becomes the commit body. AI assistance is credited only with a `Co-authored-by` trailer on commits, which GitHub carries into the squash commit; descriptions have no "Generated with" line.
 - Code has no comments. Anything that needs explaining goes in the relevant README.
 - Configs use platform and library defaults where possible and omit settings that match them. Infrastructure is the exception: OpenTofu declares every setting, defaults included.
 
