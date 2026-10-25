@@ -8,24 +8,47 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci:
+  title:
     runs-on: ubuntu-slim
     steps:
       - uses: amannn/action-semantic-pull-request@v6
-        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+  format:
+    runs-on: ubuntu-slim
+    steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
-      - name: Format
-        run: bun fmt --check
-      - name: Audit
-        run: bun audit
-      - name: Install
-        run: bun ci
-      - name: Check
-        run: bun check -b
-      - name: Test
-        run: bun test
-      - name: Build
-        run: bun run build
+      - run: bun fmt --check
+
+  audit:
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - run: bun audit
+
+  check:
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - run: bun ci
+      - run: bun check -b
+
+  test:
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - run: bun ci
+      - run: bun test
+
+  build:
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - run: bun ci
+      - run: bun run build
