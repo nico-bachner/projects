@@ -28,6 +28,7 @@ Lefthook runs them before commits and builds every package before pushes. CI run
 - Package releases follow from those titles; see each package's README.
 - Branches are named after the change's type and a short kebab-case description, such as `feat/template-option` or `ci/cache-dependencies`. A ruleset blocks creating branches with any other prefix.
 - Until a pull request is open, its branch is rewritten freely to keep a clean history: one focused commit per logical change, on the latest `main`.
+- Pull requests open with squash auto-merge enabled, so they merge as soon as the required checks pass.
 - Code has no comments. Anything that needs explaining goes in the relevant README.
 - Configs use platform and library defaults where possible and omit settings that match them. Infrastructure is the exception: OpenTofu declares every setting, defaults included.
 
