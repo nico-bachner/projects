@@ -8,7 +8,7 @@ Every setting is declared, defaults included. State lives under `terraform.tfsta
 
 ## CI
 
-The `Infra` workflow plans on pull requests that touch `infra/` and applies on `main`. It reads every credential from the Actions secrets that `github.tf` manages.
+The `Infra` workflow plans on pull requests that touch `infra/`, and the `Deploy` workflow applies on `main`. Both read every credential from the Actions secrets that `github.tf` manages.
 
 ## Running locally
 

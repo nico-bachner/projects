@@ -20,7 +20,7 @@ bun check -b
 bun test
 ```
 
-Lefthook runs them before commits and builds every package before pushes. CI runs them in the same order, then the builds.
+Lefthook runs them before commits and builds every package before pushes. CI runs each of them, and the builds, as a separate job.
 
 ## Conventions
 

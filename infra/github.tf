@@ -97,7 +97,27 @@ resource "github_repository_ruleset" "main" {
       do_not_enforce_on_create             = false
 
       required_check {
-        context        = "ci"
+        context        = "title"
+        integration_id = 0
+      }
+      required_check {
+        context        = "format"
+        integration_id = 0
+      }
+      required_check {
+        context        = "audit"
+        integration_id = 0
+      }
+      required_check {
+        context        = "check"
+        integration_id = 0
+      }
+      required_check {
+        context        = "test"
+        integration_id = 0
+      }
+      required_check {
+        context        = "build"
         integration_id = 0
       }
     }
