@@ -124,6 +124,42 @@ resource "github_repository_ruleset" "main" {
   }
 }
 
+resource "github_repository_ruleset" "branch_names" {
+  name        = "branch-names"
+  repository  = github_repository.projects.name
+  target      = "branch"
+  enforcement = "active"
+
+  conditions {
+    ref_name {
+      include = ["~ALL"]
+      exclude = [
+        "~DEFAULT_BRANCH",
+        "refs/heads/feat/**",
+        "refs/heads/fix/**",
+        "refs/heads/docs/**",
+        "refs/heads/style/**",
+        "refs/heads/refactor/**",
+        "refs/heads/perf/**",
+        "refs/heads/test/**",
+        "refs/heads/build/**",
+        "refs/heads/ci/**",
+        "refs/heads/chore/**",
+        "refs/heads/revert/**",
+      ]
+    }
+  }
+
+  rules {
+    creation                = true
+    update                  = false
+    deletion                = false
+    non_fast_forward        = false
+    required_linear_history = false
+    required_signatures     = false
+  }
+}
+
 locals {
   actions_secrets = {
     AWS_ACCESS_KEY_ID       = var.r2_access_key_id

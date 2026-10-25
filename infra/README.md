@@ -2,7 +2,7 @@
 
 One OpenTofu configuration with one state for all hosting, split into a file per provider:
 
-- `github.tf`: the `projects` repository, its default branch, vulnerability alerts, Actions permissions, `main` ruleset, and Actions secrets.
+- `github.tf`: the `projects` repository, its default branch, vulnerability alerts, Actions permissions, `main` and `branch-names` rulesets, and Actions secrets.
 
 Every setting is declared, defaults included. State lives under `terraform.tfstate` in the `tofu-state` R2 bucket, encrypted with a passphrase. Keep the passphrase, the R2 keys, and the tokens below in a password manager; GitHub secrets cannot be read back.
 
