@@ -4,7 +4,7 @@ Personal projects in a Bun workspace.
 
 ## Packages
 
-- [mdpaper](packages/mdpaper/README.md): Markdown-to-PDF CLI with a bundled LaTeX engine.
+- [Markdown Paper](packages/mdpaper/README.md): Markdown-to-PDF CLI with a bundled LaTeX engine.
 
 ## Development
 
