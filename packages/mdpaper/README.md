@@ -1,4 +1,4 @@
-# mdpaper
+# Markdown Paper
 
 Markdown and YAML frontmatter to PDF, with a bundled LaTeX engine.
 
@@ -85,6 +85,6 @@ Currently unsupported: images, tables, code blocks, raw HTML, strikethrough, tas
 ## Implementation notes
 
 - Metadata field names are validated on the whole record, not as record keys, because Zod replaces key errors with a generic message.
-- The bundled Tectonic binary is copied to a temporary directory before it runs, because the operating system cannot execute a file embedded in the mdpaper executable.
+- The bundled Tectonic binary is copied to a temporary directory before it runs, because the operating system cannot execute a file embedded in the Markdown Paper executable.
 - A failed build leaves any existing PDF in place.
 - The release workflow passes the bare version as `tag-name` to bump-homebrew-formula-action, which reads the formula version from it.
