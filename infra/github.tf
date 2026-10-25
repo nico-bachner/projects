@@ -31,7 +31,7 @@ resource "github_repository" "projects" {
   allow_merge_commit          = false
   allow_rebase_merge          = false
   allow_squash_merge          = true
-  allow_auto_merge            = false
+  allow_auto_merge            = true
   allow_update_branch         = false
   allow_forking               = true
   merge_commit_title          = "MERGE_MESSAGE"
