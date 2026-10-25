@@ -1,0 +1,6 @@
+*.bun-build
+.DS_Store
+.terraform/
+dist/
+node_modules/
+tfplan

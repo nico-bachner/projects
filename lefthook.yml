@@ -1,0 +1,16 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: fmt
+      run: bun fmt --staged
+    - name: audit
+      run: bun audit
+    - name: check
+      run: bun check -b
+    - name: test
+      run: bun test
+
+pre-push:
+  jobs:
+    - name: build
+      run: bun run build

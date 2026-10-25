@@ -1,0 +1,19 @@
+{
+  "name": "projects",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "catalog": {
+      "@types/bun": "^1.4.4"
+    }
+  },
+  "scripts": {
+    "build": "bun run --workspaces build"
+  },
+  "devDependencies": {
+    "lefthook": "^2.2.2"
+  },
+  "packageManager": "bun@1.4.4"
+}
