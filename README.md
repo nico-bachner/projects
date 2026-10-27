@@ -5,6 +5,7 @@ Personal projects in a Bun workspace.
 ## Packages
 
 - [Markdown Paper](packages/mdpaper/README.md): Markdown-to-PDF CLI with a bundled LaTeX engine.
+- [Treasury](packages/treasury/README.md): reimbursement claims and approvals for the Sydney University Canoe Club.
 
 ## Development
 

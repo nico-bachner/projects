@@ -1,4 +1,7 @@
 {
   "files": [],
-  "references": [{ "path": "packages/mdpaper" }]
+  "references": [
+    { "path": "packages/mdpaper" },
+    { "path": "packages/treasury" }
+  ]
 }
