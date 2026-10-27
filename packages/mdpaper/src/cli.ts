@@ -1,61 +1,16 @@
 #!/usr/bin/env bun
+import { type BuildOutcome, buildDocuments } from './lib/build'
 import { cancel, isCancel, log, multiselect } from '@clack/prompts'
-import {
-  discoverDocuments,
-  outputPath,
-  validateOutputNames,
-} from './lib/inputs'
+import { discoverDocuments } from './lib/inputs'
 import { parseArgs } from 'node:util'
-import { readFileSync } from 'node:fs'
-import { compilePdf } from './lib/pdf'
 import path from 'node:path'
-import { prepareDocument } from './lib/document'
 import process from 'node:process'
-import defaultTemplate from '../templates/default.tex' with { type: 'text' }
 
-type BuildOptions = Readonly<{
+type CliOptions = Readonly<{
   inputs: readonly string[]
   outputDirectory: string
   templatePath: string | null
 }>
-
-type BuildResult = Readonly<{
-  sourcePath: string
-  outputPath: string
-  wordCount: number
-}>
-
-type BuildOutcome =
-  | Readonly<{ ok: true; result: BuildResult }>
-  | Readonly<{ ok: false; sourcePath: string; error: unknown }>
-
-const buildDocument = (
-  sourcePath: string,
-  template: string,
-  outputDirectory: string,
-): Promise<BuildResult> => {
-  const document = prepareDocument(readFileSync(sourcePath, 'utf8'), template)
-  const destination = outputPath(sourcePath, outputDirectory)
-  return compilePdf(document.latex, destination).then(() => ({
-    outputPath: destination,
-    sourcePath,
-    wordCount: document.wordCount,
-  }))
-}
-
-const tryBuildDocument = (
-  sourcePath: string,
-  template: string,
-  outputDirectory: string,
-): Promise<BuildOutcome> => {
-  try {
-    return buildDocument(sourcePath, template, outputDirectory)
-      .then((result): BuildOutcome => ({ ok: true, result }))
-      .catch((error): BuildOutcome => ({ error, ok: false, sourcePath }))
-  } catch (error) {
-    return Promise.resolve({ error, ok: false, sourcePath })
-  }
-}
 
 const displayPath = (filename: string): string =>
   path.relative(process.cwd(), filename)
@@ -95,37 +50,24 @@ const reportOutcome = (outcome: BuildOutcome): void => {
 
 const buildSelectedDocuments = (
   files: readonly string[],
-  options: BuildOptions,
+  options: CliOptions,
 ): Promise<void> => {
   if (files.length === 0) {
     return Promise.resolve()
   }
-  validateOutputNames(files)
-  const template = options.templatePath
-    ? readFileSync(options.templatePath, 'utf8')
-    : defaultTemplate
-  return Promise.all(
-    files.map((filename) =>
-      tryBuildDocument(filename, template, options.outputDirectory).then(
-        (outcome) => {
-          reportOutcome(outcome)
-          return outcome
-        },
-      ),
-    ),
-  ).then((outcomes) => {
+  return buildDocuments(files, options, reportOutcome).then((outcomes) => {
     const failures = outcomes.filter((outcome) => !outcome.ok)
     if (failures.length > 0)
       throw new Error(`${failures.length} document(s) failed to build.`)
   })
 }
 
-const runBuild = (options: BuildOptions): Promise<void> =>
+const runBuild = (options: CliOptions): Promise<void> =>
   Promise.resolve()
     .then(() => selectDocuments(options.inputs))
     .then((files) => buildSelectedDocuments(files, options))
 
-const parseOptions = (): BuildOptions | false => {
+const parseOptions = (): CliOptions | false => {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
     args: process.argv.slice(2),

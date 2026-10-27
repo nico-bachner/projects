@@ -41,6 +41,14 @@ bun run build
 
 Every merge to `main` with releasable changes publishes a release. [git-cliff](https://git-cliff.org) reads the Conventional Commits that change files in `packages/mdpaper` since the last `mdpaper-v*` tag: `feat` bumps the minor version, `fix` and `perf` the patch version, and breaking changes the major version. Other types do not release. The release workflow builds executables for macOS ARM64, Linux x64, and Linux ARM64, and publishes them with `SHA256SUMS` and git-cliff's notes as a GitHub Release. Each platform builds on its own runner because the build bundles the Tectonic binary installed for that runner. It then updates the macOS formula in `nico-bachner/homebrew-tap`. Releases need the `HOMEBREW_TAP_TOKEN` Actions secret, which [infra](../../infra/README.md) manages.
 
+## Terms
+
+- **Document**: a Markdown file that starts with YAML frontmatter. Folders are searched for these.
+- **Metadata**: the frontmatter fields, such as `title`, `author`, `date`, and any custom fields, which fill the template's placeholders.
+- **Template**: the LaTeX file a document is poured into: the bundled default, or one passed with `--template`.
+- **LaTeX engine**: Tectonic, bundled into the executable, which turns the filled template into a PDF.
+- **Build**: one `mdpaper build` run, turning the chosen documents into PDFs in one output folder. Each document succeeds or fails on its own.
+
 ## Input
 
 Save this as `paper.md`:
