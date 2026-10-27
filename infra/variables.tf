@@ -17,13 +17,19 @@ variable "r2_secret_access_key" {
 }
 
 variable "github_admin_token" {
-  description = "GitHub token with administration access to projects, stored for CI."
+  description = "GitHub token with administration access to projects, also stored for CI."
   type        = string
   sensitive   = true
 }
 
 variable "homebrew_tap_token" {
   description = "GitHub token with contents write access to homebrew-tap."
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudflare_api_token" {
+  description = "Cloudflare token with D1 and R2 edit access, also stored for CI."
   type        = string
   sensitive   = true
 }

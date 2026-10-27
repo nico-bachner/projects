@@ -2,6 +2,7 @@
 
 One OpenTofu configuration with one state for all hosting, split into a file per provider:
 
+- `cloudflare.tf`: the `treasury` D1 database and R2 bucket for [Treasury](../packages/treasury/README.md).
 - `github.tf`: the `projects` repository, its default branch, vulnerability alerts, Actions permissions, `main` and `branch-names` rulesets, and Actions secrets.
 
 Every setting is declared, defaults included. State lives under `terraform.tfstate` in the `tofu-state` R2 bucket, encrypted with a passphrase. Keep the passphrase, the R2 keys, and the tokens below in a password manager; GitHub secrets cannot be read back.
@@ -12,13 +13,13 @@ The `Infra` workflow plans on pull requests that touch `infra/`, and the `Deploy
 
 ## Running locally
 
-Only bootstrap and recovery need a local run. Set these environment variables:
+Only bootstrap and recovery need a local run. Set these environment variables. Apart from the state backend's keys, OpenTofu uses each credential and also stores it as an Actions secret for CI:
 
-- `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`: the R2 token for `tofu-state`.
-- `GITHUB_TOKEN`: a token that can administer `projects`, such as `gh auth token`.
+- `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`: the R2 token for `tofu-state`. The backend cannot read them from variables, because OpenTofu would save them in `.terraform` and in plan files.
 - `TF_VAR_state_passphrase`: the state passphrase.
-- `TF_VAR_r2_access_key_id` and `TF_VAR_r2_secret_access_key`: the R2 token again, stored for CI.
-- `TF_VAR_github_admin_token`: a fine-grained token with Administration and Secrets read and write on `projects`, stored for CI.
+- `TF_VAR_r2_access_key_id` and `TF_VAR_r2_secret_access_key`: the same R2 token, stored for CI.
+- `TF_VAR_cloudflare_api_token`: a Cloudflare account token with D1 Edit and Workers R2 Storage Edit.
+- `TF_VAR_github_admin_token`: a fine-grained token with Administration and Secrets read and write on `projects`.
 - `TF_VAR_homebrew_tap_token`: a fine-grained token with Contents read and write on `homebrew-tap`.
 
 Then, from the repository root:

@@ -165,6 +165,7 @@ locals {
   actions_secrets = {
     AWS_ACCESS_KEY_ID       = var.r2_access_key_id
     AWS_SECRET_ACCESS_KEY   = var.r2_secret_access_key
+    CLOUDFLARE_API_TOKEN    = var.cloudflare_api_token
     HOMEBREW_TAP_TOKEN      = var.homebrew_tap_token
     TF_VAR_state_passphrase = var.state_passphrase
     TOFU_GITHUB_TOKEN       = var.github_admin_token

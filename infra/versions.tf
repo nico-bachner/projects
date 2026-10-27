@@ -2,6 +2,10 @@ terraform {
   required_version = "~> 1.13"
 
   required_providers {
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5.28"
+    }
     github = {
       source  = "integrations/github"
       version = "~> 6.13"
@@ -42,6 +46,11 @@ terraform {
   }
 }
 
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
+}
+
 provider "github" {
   owner = "nico-bachner"
+  token = var.github_admin_token
 }
