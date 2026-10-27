@@ -5,13 +5,13 @@ variable "state_passphrase" {
 }
 
 variable "r2_access_key_id" {
-  description = "R2 access key for the tofu-state bucket, also stored for CI."
+  description = "R2 access key for the tofu-state bucket, stored for CI."
   type        = string
   sensitive   = true
 }
 
 variable "r2_secret_access_key" {
-  description = "R2 secret key for the tofu-state bucket, also stored for CI."
+  description = "R2 secret key for the tofu-state bucket, stored for CI."
   type        = string
   sensitive   = true
 }
