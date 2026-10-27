@@ -19,6 +19,12 @@
         "@types/bun": "catalog:",
       },
     },
+    "packages/treasury": {
+      "name": "treasury",
+      "devDependencies": {
+        "@types/bun": "catalog:",
+      },
+    },
   },
   "catalog": {
     "@types/bun": "^1.4.4",
@@ -79,6 +85,8 @@
     "node-tectonic-windows-x64": ["node-tectonic-windows-x64@1.1.0", "", { "os": "win32", "cpu": "x64" }, "sha512-qG2/EQvIL6NAh9FYSU3n6EDW+zWbf4BUOcYDR5O3GbzZC7f/JXxBTYd8d1LuqrJd1Wb3mF+ZSlFKfqZE0BGT6g=="],
 
     "sisteransi": ["sisteransi@1.0.5", "", {}, "sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg=="],
+
+    "treasury": ["treasury@workspace:packages/treasury"],
 
     "undici-types": ["undici-types@8.12.1", "", {}, "sha512-nCiEcIx87oMw9u3Yzj2DuRBzv6p0e7akhy4HUPtpBiVWmAY3o6Phznst8QhmY1oLMttLgJ2tlAvsKuzCgBSoAw=="],
 

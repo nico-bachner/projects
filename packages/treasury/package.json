@@ -1,0 +1,10 @@
+{
+  "name": "treasury",
+  "private": true,
+  "scripts": {
+    "import": "bun scripts/import.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:"
+  }
+}
