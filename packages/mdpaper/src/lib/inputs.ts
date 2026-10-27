@@ -45,18 +45,3 @@ export const discoverDocuments = (inputs: readonly string[]): string[] => {
   }
   return documents
 }
-
-export const outputPath = (
-  sourcePath: string,
-  outputDirectory: string,
-): string =>
-  path.join(outputDirectory, `${path.basename(sourcePath, '.md')}.pdf`)
-
-export const validateOutputNames = (files: readonly string[]): void => {
-  const names = files.map((file) => path.basename(file, '.md').toLowerCase())
-  if (new Set(names).size !== names.length) {
-    throw new Error(
-      'Choose documents with unique filenames; generated PDFs share one folder.',
-    )
-  }
-}
