@@ -4,6 +4,12 @@ variable "state_passphrase" {
   sensitive   = true
 }
 
+variable "previous_state_passphrase" {
+  description = "Passphrase the state was encrypted with before the current one, used to decrypt it once."
+  type        = string
+  sensitive   = true
+}
+
 variable "r2_access_key_id" {
   description = "R2 access key for the tofu-state bucket, stored for CI."
   type        = string

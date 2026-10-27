@@ -26,18 +26,30 @@ terraform {
 
   encryption {
     key_provider "pbkdf2" "state" {
+      passphrase = var.previous_state_passphrase
+    }
+    key_provider "pbkdf2" "current" {
       passphrase = var.state_passphrase
     }
     method "aes_gcm" "state" {
       keys = key_provider.pbkdf2.state
     }
+    method "aes_gcm" "current" {
+      keys = key_provider.pbkdf2.current
+    }
     state {
-      method   = method.aes_gcm.state
+      method   = method.aes_gcm.current
       enforced = true
+      fallback {
+        method = method.aes_gcm.state
+      }
     }
     plan {
-      method   = method.aes_gcm.state
+      method   = method.aes_gcm.current
       enforced = true
+      fallback {
+        method = method.aes_gcm.state
+      }
     }
   }
 }
