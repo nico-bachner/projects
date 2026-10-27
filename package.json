@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "build": "bun run --workspaces build"
+    "build": "bun run --workspaces --if-present build"
   },
   "devDependencies": {
     "lefthook": "^2.2.2"
