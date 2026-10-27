@@ -10,9 +10,6 @@ concurrency:
   group: infra
 
 env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  GITHUB_TOKEN: ${{ secrets.TOFU_GITHUB_TOKEN }}
   TF_VAR_state_passphrase: ${{ secrets.TF_VAR_state_passphrase }}
   TF_VAR_r2_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
   TF_VAR_r2_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

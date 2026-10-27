@@ -13,9 +13,11 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "tofu-state"
-    key    = "terraform.tfstate"
-    region = "auto"
+    bucket     = "tofu-state"
+    key        = "terraform.tfstate"
+    region     = "auto"
+    access_key = var.r2_access_key_id
+    secret_key = var.r2_secret_access_key
     endpoints = {
       s3 = "https://bc01cb67e58d38ab891c5391edb5834e.r2.cloudflarestorage.com"
     }
@@ -52,4 +54,5 @@ provider "cloudflare" {
 
 provider "github" {
   owner = "nico-bachner"
+  token = var.github_admin_token
 }
