@@ -29,7 +29,7 @@ variable "homebrew_tap_token" {
 }
 
 variable "cloudflare_api_token" {
-  description = "Cloudflare token with D1 and R2 edit access, stored for CI."
+  description = "Cloudflare token with D1 and R2 edit access, also stored for CI."
   type        = string
   sensitive   = true
 }

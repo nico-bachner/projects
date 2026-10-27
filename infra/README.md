@@ -16,11 +16,10 @@ The `Infra` workflow plans on pull requests that touch `infra/`, and the `Deploy
 Only bootstrap and recovery need a local run. Set these environment variables:
 
 - `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`: the R2 token for `tofu-state`.
-- `CLOUDFLARE_API_TOKEN`: a Cloudflare token with D1 Edit and Workers R2 Storage Edit on the account.
 - `GITHUB_TOKEN`: a token that can administer `projects`, such as `gh auth token`.
 - `TF_VAR_state_passphrase`: the state passphrase.
 - `TF_VAR_r2_access_key_id` and `TF_VAR_r2_secret_access_key`: the R2 token again, stored for CI.
-- `TF_VAR_cloudflare_api_token`: the Cloudflare token again, stored for CI.
+- `TF_VAR_cloudflare_api_token`: a Cloudflare account token with D1 Edit and Workers R2 Storage Edit, also stored for CI.
 - `TF_VAR_github_admin_token`: a fine-grained token with Administration and Secrets read and write on `projects`, stored for CI.
 - `TF_VAR_homebrew_tap_token`: a fine-grained token with Contents read and write on `homebrew-tap`.
 
