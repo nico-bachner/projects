@@ -5,6 +5,7 @@
     "import": "bun scripts/import.ts"
   },
   "devDependencies": {
-    "@types/bun": "catalog:"
+    "@types/bun": "catalog:",
+    "wrangler": "^4.153.0"
   }
 }

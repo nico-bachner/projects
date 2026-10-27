@@ -1,0 +1,11 @@
+{
+  "name": "treasury",
+  "account_id": "bc01cb67e58d38ab891c5391edb5834e",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "treasury",
+      "database_id": "ff934317-6a1c-4481-9b95-cd028536de12",
+    },
+  ],
+}

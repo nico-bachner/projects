@@ -1,0 +1,27 @@
+name: Treasury
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/treasury/migrations/**'
+      - 'packages/treasury/wrangler.jsonc'
+      - '.github/workflows/treasury.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: treasury
+
+jobs:
+  migrate:
+    runs-on: ubuntu-slim
+    defaults:
+      run:
+        working-directory: packages/treasury
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - run: bun ci
+      - run: bunx wrangler d1 migrations apply treasury --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
