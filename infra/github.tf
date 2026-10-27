@@ -120,6 +120,10 @@ resource "github_repository_ruleset" "main" {
         context        = "build"
         integration_id = 0
       }
+      required_check {
+        context        = "plan"
+        integration_id = 0
+      }
     }
   }
 }
