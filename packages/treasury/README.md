@@ -8,11 +8,14 @@ This package so far holds the database schema and the one-off import of the old 
 
 The `treasury` D1 database and R2 bucket are declared in [infra](../../infra/README.md). D1 is the source of truth and R2 holds receipts under `receipts/<sha256>.<ext>`. Backups are D1's 30-day point-in-time restore; anything older can be rebuilt from the receipts and the batches sent to SUS.
 
-Apply the schema once the database exists:
+Schema changes are numbered SQL files in `migrations`. The Treasury workflow applies new ones to D1 when they reach `main`, and D1 records which have run. To try them against a local copy of the database:
 
 ```sh
-bunx wrangler d1 execute treasury --remote --file=packages/treasury/migrations/0001_init.sql
+cd packages/treasury
+bunx wrangler d1 migrations apply treasury --local
 ```
+
+`wrangler.jsonc` names the database for Wrangler.
 
 Amounts are integer cents. Category, discipline, status and review decision are checked enums, and requesting changes or rejecting needs a note. Reviews start empty: expenses SUS already reimbursed are imported without approval history.
 
