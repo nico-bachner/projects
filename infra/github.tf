@@ -146,6 +146,7 @@ resource "github_repository_ruleset" "branch_names" {
         "refs/heads/ci/**",
         "refs/heads/chore/**",
         "refs/heads/revert/**",
+        "refs/heads/wip/**",
       ]
     }
   }
