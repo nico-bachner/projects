@@ -2,6 +2,7 @@
 import { spawn } from 'bun'
 import { type BuildOutcome, buildDocuments } from './lib/build'
 import { cancel, isCancel, log, multiselect } from '@clack/prompts'
+import { compilePdf } from './lib/pdf'
 import { discoverDocuments } from './lib/inputs'
 import { parseArgs } from 'node:util'
 import path from 'node:path'
@@ -12,6 +13,7 @@ type CliOptions = Readonly<{
   output: string | null
   templatePath: string | null
   open: boolean
+  verbose: boolean
 }>
 
 const displayPath = (filename: string): string =>
@@ -77,11 +79,15 @@ const buildSelectedDocuments = (
       openPdf(outcome.result.outputPath)
     }
   }
-  return buildDocuments(files, options, onOutcome).then((outcomes) => {
-    const failures = outcomes.filter((outcome) => !outcome.ok)
-    if (failures.length > 0)
-      throw new Error(`${failures.length} document(s) failed to build.`)
-  })
+  const compile = (latex: string, outputPath: string): Promise<void> =>
+    compilePdf(latex, outputPath, options.verbose)
+  return buildDocuments(files, { ...options, compile }, onOutcome).then(
+    (outcomes) => {
+      const failures = outcomes.filter((outcome) => !outcome.ok)
+      if (failures.length > 0)
+        throw new Error(`${failures.length} document(s) failed to build.`)
+    },
+  )
 }
 
 const runBuild = (options: CliOptions): Promise<void> =>
@@ -96,13 +102,14 @@ const parseOptions = (): CliOptions | false => {
     options: {
       help: { short: 'h', type: 'boolean' },
       open: { type: 'boolean' },
+      verbose: { type: 'boolean' },
       output: { short: 'o', type: 'string' },
       template: { type: 'string' },
     },
   })
   if (values.help) {
     process.stdout.write(
-      'Usage: mdpaper build [files or folders...] [-o, --output paper.pdf] [--template paper.tex] [--open]\n',
+      'Usage: mdpaper build [files or folders...] [-o, --output paper.pdf] [--template paper.tex] [--open] [--verbose]\n',
     )
     return false
   }
@@ -113,6 +120,7 @@ const parseOptions = (): CliOptions | false => {
     inputs,
     open: values.open ?? false,
     output: values.output ? path.resolve(values.output) : null,
+    verbose: values.verbose ?? false,
     templatePath: values.template ? path.resolve(values.template) : null,
   }
 }
