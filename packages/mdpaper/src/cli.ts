@@ -8,7 +8,7 @@ import process from 'node:process'
 
 type CliOptions = Readonly<{
   inputs: readonly string[]
-  outputDirectory: string
+  output: string | null
   templatePath: string | null
 }>
 
@@ -73,13 +73,13 @@ const parseOptions = (): CliOptions | false => {
     args: process.argv.slice(2),
     options: {
       help: { short: 'h', type: 'boolean' },
-      'out-dir': { default: 'dist', type: 'string' },
+      output: { short: 'o', type: 'string' },
       template: { type: 'string' },
     },
   })
   if (values.help) {
     process.stdout.write(
-      'Usage: mdpaper build [files or folders...] [--out-dir dist] [--template paper.tex]\n',
+      'Usage: mdpaper build [files or folders...] [-o, --output paper.pdf] [--template paper.tex]\n',
     )
     return false
   }
@@ -88,7 +88,7 @@ const parseOptions = (): CliOptions | false => {
   )
   return {
     inputs,
-    outputDirectory: path.resolve(values['out-dir']),
+    output: values.output ? path.resolve(values.output) : null,
     templatePath: values.template ? path.resolve(values.template) : null,
   }
 }
