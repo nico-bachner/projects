@@ -17,6 +17,12 @@ const renderLink = (label: string, url: string): string => {
   return `\\href{${url}}{${label}}`
 }
 
+const linkBareUrls = (markdown: string): string =>
+  markdown.replaceAll(
+    /(?<![(<`\w])https?:\/\/[^\s<>`]*[^\s<>`.,;:!?'")\]]/gu,
+    (url) => `<${url}>`,
+  )
+
 const wrapEnvironment = (name: string, content: string): string =>
   `\\begin{${name}}\n${content}\\end{${name}}\n\n`
 
@@ -214,7 +220,7 @@ export const prepareDocument = (
       false,
     ),
   ]
-  const body = renderMarkdown([before, counted, after].join('\n'))
+  const body = renderMarkdown(linkBareUrls([before, counted, after].join('\n')))
   return {
     latex: fillTemplate(
       template,

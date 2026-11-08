@@ -89,6 +89,18 @@ describe('buildDocuments', () => {
     )
   })
 
+  test('turns bare URLs into breakable links', async () => {
+    await build([
+      writeDocument(
+        'essay.md',
+        '---\ntitle: Essay\n---\nSee https://example.com/a_b.\n',
+      ),
+    ])
+    expect(Object.values(compiled)[0]).toContain(
+      'See \\url{https://example.com/a_b}.',
+    )
+  })
+
   test('counts words in each section', async () => {
     const [outcome] = await build([
       writeDocument(

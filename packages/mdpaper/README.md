@@ -89,7 +89,7 @@ PDFs are named after their source files and written beside them: `notes/paper.md
 
 Custom `.tex` templates need exactly one `{{body}}` placeholder. Use `{{title}}`, `{{author}}`, `{{date}}`, or additional frontmatter fields for metadata. Metadata is escaped as text; missing placeholder values cause an error. See [the default template](templates/default.tex) for an example.
 
-Supported: paragraphs, `##` through `####` headings, bold, emphasis, HTTP(S) links, basic lists, blockquotes, inline code, and horizontal rules. Put the document title in frontmatter.
+Supported: paragraphs, `##` through `####` headings, bold, emphasis, HTTP(S) links and bare URLs, basic lists, blockquotes, inline code, and horizontal rules. Put the document title in frontmatter.
 
 Currently unsupported: images, tables, code blocks, raw HTML, strikethrough, task lists, and ordered lists starting after 1.
 
@@ -97,5 +97,6 @@ Currently unsupported: images, tables, code blocks, raw HTML, strikethrough, tas
 
 - Metadata field names are validated on the whole record, not as record keys, because Zod replaces key errors with a generic message.
 - The bundled Tectonic binary is copied to a temporary directory before it runs, because the operating system cannot execute a file embedded in the Markdown Paper executable.
+- Bare URLs become `\url` links, and the default template loads `xurl`, so long URLs wrap instead of overflowing the margin.
 - A failed build leaves any existing PDF in place.
 - The release workflow passes the bare version as `tag-name` to bump-homebrew-formula-action, which reads the formula version from it.
