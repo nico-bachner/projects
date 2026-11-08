@@ -53,7 +53,7 @@ const openPdf = (filename: string): void => {
       stdout: 'ignore',
     }).unref()
   } catch (error) {
-    log.warn(`Could not open ${displayPath(filename)}: ${String(error)}`)
+    log.warn(`Could not open ${displayPath(filename)}: ${errorMessage(error)}`)
   }
 }
 
@@ -63,7 +63,9 @@ const reportOutcome = (outcome: BuildOutcome): void => {
     log.success(`${displayPath(destination)} · ${wordCount} words`)
     return
   }
-  log.error(`${displayPath(outcome.sourcePath)}: ${String(outcome.error)}`)
+  log.error(
+    `${displayPath(outcome.sourcePath)}: ${errorMessage(outcome.error)}`,
+  )
 }
 
 const buildSelectedDocuments = (
@@ -95,22 +97,44 @@ const runBuild = (options: CliOptions): Promise<void> =>
     .then(() => selectDocuments(options.inputs))
     .then((files) => buildSelectedDocuments(files, options))
 
+const usage = `Usage: mdpaper build [files or folders...] [options]
+
+Options:
+  -o, --output <file>    PDF path, for a single document (default: beside the source)
+  --template <file>      Custom LaTeX template
+  --open                 Open each built PDF
+  --verbose              Show the LaTeX engine's log
+  -h, --help             Show this help
+`
+
+class UsageError extends Error {}
+
+const errorMessage = (error: unknown): string =>
+  error instanceof Error ? error.message : String(error)
+
+const readArgs = () => {
+  try {
+    return parseArgs({
+      allowPositionals: true,
+      args: process.argv.slice(2),
+      options: {
+        help: { short: 'h', type: 'boolean' },
+        open: { type: 'boolean' },
+        verbose: { type: 'boolean' },
+        output: { short: 'o', type: 'string' },
+        template: { type: 'string' },
+      },
+    })
+  } catch (error) {
+    const [problem = ''] = errorMessage(error).split(/(?<=\.) /u)
+    throw new UsageError(`${problem}\n\n${usage}`)
+  }
+}
+
 const parseOptions = (): CliOptions | false => {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    args: process.argv.slice(2),
-    options: {
-      help: { short: 'h', type: 'boolean' },
-      open: { type: 'boolean' },
-      verbose: { type: 'boolean' },
-      output: { short: 'o', type: 'string' },
-      template: { type: 'string' },
-    },
-  })
+  const { values, positionals } = readArgs()
   if (values.help) {
-    process.stdout.write(
-      'Usage: mdpaper build [files or folders...] [-o, --output paper.pdf] [--template paper.tex] [--open] [--verbose]\n',
-    )
+    process.stdout.write(usage)
     return false
   }
   const inputs = positionals.filter(
@@ -134,7 +158,11 @@ if (import.meta.main) {
       }
     })
     .catch((error) => {
-      log.error(`Build failed: ${String(error)}`)
+      log.error(
+        error instanceof UsageError
+          ? error.message
+          : `Build failed: ${errorMessage(error)}`,
+      )
       process.exitCode = 1
     })
 }
