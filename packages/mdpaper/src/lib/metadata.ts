@@ -1,4 +1,4 @@
-import * as Bun from 'bun'
+import { YAML } from 'bun'
 import { z } from 'zod'
 
 const metadataValue = z
@@ -58,7 +58,7 @@ export const parseDocument = (source: string): DocumentSource => {
   }
 
   const [, yaml, markdown] = match
-  const result = metadataSchema.safeParse(Bun.YAML.parse(yaml))
+  const result = metadataSchema.safeParse(YAML.parse(yaml))
 
   if (!result.success) {
     throw new Error(`Invalid essay metadata:\n${z.prettifyError(result.error)}`)

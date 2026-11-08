@@ -1,4 +1,4 @@
-import * as Bun from 'bun'
+import { embeddedFiles, isStandaloneExecutable, spawnSync } from 'bun'
 import {
   chmodSync,
   mkdirSync,
@@ -15,10 +15,10 @@ export const compilePdf = (
   outputPath: string,
   verbose = false,
 ): Promise<void> => {
-  const embeddedEngine = (Bun.embeddedFiles as readonly File[]).find(
+  const embeddedEngine = (embeddedFiles as readonly File[]).find(
     (file) => file.name.endsWith('/tectonic') || file.name === 'tectonic',
   )
-  if (Bun.isStandaloneExecutable && !embeddedEngine) {
+  if (isStandaloneExecutable && !embeddedEngine) {
     throw new Error('Missing bundled LaTeX engine. Build with bun run build.')
   }
   const outputDirectory = path.dirname(outputPath)
@@ -36,7 +36,7 @@ export const compilePdf = (
         writeFileSync(engine, new Uint8Array(engineBytes))
         chmodSync(engine, 0o700)
       }
-      const compilation = Bun.spawnSync(
+      const compilation = spawnSync(
         [engine, sourcePath, '--outdir', temporaryDirectory],
         {
           cwd: temporaryDirectory,
