@@ -85,6 +85,15 @@ mdpaper build paper.md --output final.pdf --template custom.tex
 
 PDFs are named after their source files and written beside them: `notes/paper.md` becomes `notes/paper.pdf`, unless `--output` names another path. Documents whose PDFs would share a path are rejected. Successful builds replace existing PDFs; failed builds preserve the previous output. Reported word counts are approximate and exclude frontmatter. Each heading is listed with the words in it and its text, including its subsections, indented by level from `##`. `--word-count` adds the same breakdown to the PDF as a table on a new final page; that page isn't counted. To leave parts of a document out of the total, put `<!-- start word count -->` and `<!-- end word count -->` on their own lines: only the text between them counts, and sections outside them are listed as not counted. Use either marker alone to leave out just the beginning, such as an essay question, or just the end, such as a bibliography. Only the first of each marker counts, and an end marker before the start marker is ignored.
 
+## Formatting
+
+```sh
+mdpaper fmt paper.md notes/
+mdpaper fmt --check
+```
+
+`fmt` formats documents in place, finding them the same way `build` does but without the picker. `--check` changes nothing, lists documents that need formatting, and exits with status 1 if any do, for editors and pre-commit hooks. Formatting comes from the Bun bundled in the executable, so it can change between releases that update Bun.
+
 ## Templates and Markdown support
 
 Custom `.tex` templates need exactly one `{{body}}` placeholder. Use `{{title}}`, `{{author}}`, `{{date}}`, or additional frontmatter fields for metadata. Metadata is escaped as text; missing placeholder values cause an error. See [the default template](templates/default.tex) for an example.
@@ -99,5 +108,6 @@ Currently unsupported: images, tables, code blocks, raw HTML, strikethrough, tas
 - The bundled Tectonic binary is copied to a temporary directory before it runs, because the operating system cannot execute a file embedded in the Markdown Paper executable.
 - Bare URLs become `\url` links, and the default template loads `xurl`, so long URLs wrap instead of overflowing the margin.
 - Straight quotes become curly ones. Each text fragment arrives separately from the Markdown renderer, so a quote is judged by its neighbours: after a space or bracket, or at a fragment's start before text, a double quote opens; a single quote opens only after a space or bracket, so apostrophes after emphasis stay apostrophes.
+- `fmt` runs the executable as Bun itself (`BUN_BE_BUN=1`) with `bun fmt --no-script`, one document at a time; `--no-script` stops a `fmt` script in the user's `package.json` from running instead.
 - A failed build leaves any existing PDF in place.
 - The release workflow passes the bare version as `tag-name` to bump-homebrew-formula-action, which reads the formula version from it.

@@ -4,11 +4,14 @@ import { type BuildOutcome, buildDocuments } from './lib/build'
 import { cancel, isCancel, log, multiselect } from '@clack/prompts'
 import { compilePdf } from './lib/pdf'
 import { discoverDocuments } from './lib/inputs'
+import { formatDocument } from './lib/format'
 import { parseArgs } from 'node:util'
 import path from 'node:path'
 import process from 'node:process'
 
 type CliOptions = Readonly<{
+  command: 'build' | 'fmt'
+  check: boolean
   inputs: readonly string[]
   output: string | null
   templatePath: string | null
@@ -108,14 +111,41 @@ const runBuild = (options: CliOptions): Promise<void> =>
     .then(() => selectDocuments(options.inputs))
     .then((files) => buildSelectedDocuments(files, options))
 
-const usage = `Usage: mdpaper build [files or folders...] [options]
+const runFormat = (options: CliOptions): void => {
+  const files = discoverDocuments(
+    options.inputs.length > 0 ? options.inputs : [process.cwd()],
+  )
+  const changed = files.filter((file) => {
+    const status = formatDocument(file, options.check)
+    if (status !== 'unchanged') {
+      log.info(`${displayPath(file)} · ${status}`)
+    }
+    return status !== 'unchanged'
+  })
+  if (options.check && changed.length > 0) {
+    throw new UsageError(
+      `${changed.length} document(s) need formatting. Run mdpaper fmt to fix them.`,
+    )
+  }
+  const summary = options.check
+    ? `All ${files.length} document(s) are formatted.`
+    : `Formatted ${changed.length} of ${files.length} document(s).`
+  log.success(summary)
+}
 
-Options:
+const usage = `Usage: mdpaper build [files or folders...] [options]
+       mdpaper fmt [files or folders...] [--check]
+
+Build options:
   -o, --output <file>    PDF path, for a single document (default: beside the source)
   --template <file>      Custom LaTeX template
   --open                 Open each built PDF
   --verbose              Show the LaTeX engine's log
   --word-count           Add a page with the word count by section
+
+Format options:
+  --check                Report documents that need formatting without changing them
+
   -h, --help             Show this help
 `
 
@@ -130,6 +160,7 @@ const readArgs = () => {
       allowPositionals: true,
       args: process.argv.slice(2),
       options: {
+        check: { type: 'boolean' },
         help: { short: 'h', type: 'boolean' },
         open: { type: 'boolean' },
         verbose: { type: 'boolean' },
@@ -150,10 +181,13 @@ const parseOptions = (): CliOptions | false => {
     process.stdout.write(usage)
     return false
   }
-  const inputs = positionals.filter(
-    (value, index) => value !== 'build' || index !== 0,
-  )
+  const [first] = positionals
+  const command = first === 'fmt' ? 'fmt' : 'build'
+  const inputs =
+    first === 'fmt' || first === 'build' ? positionals.slice(1) : positionals
   return {
+    check: values.check ?? false,
+    command,
     inputs,
     open: values.open ?? false,
     output: values.output ? path.resolve(values.output) : null,
@@ -167,9 +201,10 @@ if (import.meta.main) {
   await Promise.resolve()
     .then(() => {
       const options = parseOptions()
-      if (options !== false) {
-        return runBuild(options)
+      if (options === false) {
+        return
       }
+      return options.command === 'fmt' ? runFormat(options) : runBuild(options)
     })
     .catch((error) => {
       log.error(
