@@ -23,6 +23,15 @@ const linkBareUrls = (markdown: string): string =>
     (url) => `<${url}>`,
   )
 
+const curlQuotes = (text: string): string =>
+  text
+    .replaceAll(/(?<=^|[\s([{\u2014\u2013-])"(?=\S)/gu, '\u201C')
+    .replaceAll('"', '\u201D')
+    .replaceAll(/(?<=[\s([{\u2014\u2013-])'(?=\S)/gu, '\u2018')
+    .replaceAll("'", '\u2019')
+
+const renderText = (text: string): string => escapeTex(curlQuotes(text))
+
 const wrapEnvironment = (name: string, content: string): string =>
   `\\begin{${name}}\n${content}\\end{${name}}\n\n`
 
@@ -79,7 +88,7 @@ const renderMarkdown = (markdown: string): string => {
     strikethrough: () => rejectMarkdown('strikethrough'),
     strong: (content) => `\\textbf{${content}}`,
     table: () => rejectMarkdown('tables'),
-    text: escapeTex,
+    text: renderText,
   })
 }
 
