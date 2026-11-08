@@ -71,16 +71,16 @@ Pass files or folders; folders are searched recursively for `.md` files with fro
 ## Options
 
 ```sh
-mdpaper build paper.md notes/ --out-dir output --template custom.tex
+mdpaper build paper.md --output final.pdf --template custom.tex
 ```
 
-| Option         | Default          | Purpose                                              |
-| -------------- | ---------------- | ---------------------------------------------------- |
-| `--out-dir`    | `dist`           | Output directory, relative to the current directory. |
-| `--template`   | Bundled template | Custom LaTeX template.                               |
-| `--help`, `-h` |                  | Show usage.                                          |
+| Option           | Default           | Purpose                                                                  |
+| ---------------- | ----------------- | ------------------------------------------------------------------------ |
+| `--output`, `-o` | Beside the source | PDF path, relative to the current directory. Only for a single document. |
+| `--template`     | Bundled template  | Custom LaTeX template.                                                   |
+| `--help`, `-h`   |                   | Show usage.                                                              |
 
-PDFs are named after their source files: `paper.md` becomes `dist/paper.pdf`. Duplicate names within a batch are rejected. Successful builds replace existing PDFs; failed builds preserve the previous output. Reported word counts are approximate and exclude frontmatter.
+PDFs are named after their source files and written beside them: `notes/paper.md` becomes `notes/paper.pdf`, unless `--output` names another path. Documents whose PDFs would share a path are rejected. Successful builds replace existing PDFs; failed builds preserve the previous output. Reported word counts are approximate and exclude frontmatter.
 
 ## Templates and Markdown support
 

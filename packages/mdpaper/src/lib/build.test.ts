@@ -25,11 +25,7 @@ const build = (
   files: readonly string[],
   templatePath: string | null = null,
 ): Promise<BuildOutcome[]> =>
-  buildDocuments(
-    files,
-    { compile, outputDirectory: path.join(directory, 'dist'), templatePath },
-    () => {},
-  )
+  buildDocuments(files, { compile, output: null, templatePath }, () => {})
 
 beforeEach(() => {
   directory = mkdtempSync(path.join(os.tmpdir(), 'mdpaper-build-'))
@@ -41,7 +37,30 @@ afterEach(() => {
 })
 
 describe('buildDocuments', () => {
-  test('names each PDF after its source in the output folder', async () => {
+  test('writes to the chosen output path', async () => {
+    const output = path.join(directory, 'out', 'final.pdf')
+    const [outcome] = await buildDocuments(
+      [writeDocument('essay.md', '---\ntitle: Essay\n---\n')],
+      { compile, output, templatePath: null },
+      () => {},
+    )
+    expect(outcome?.ok && outcome.result.outputPath).toBe(output)
+  })
+
+  test('rejects an output path for several documents', async () => {
+    await expect(
+      buildDocuments(
+        [
+          writeDocument('a.md', '---\ntitle: A\n---\n'),
+          writeDocument('b.md', '---\ntitle: B\n---\n'),
+        ],
+        { compile, output: path.join(directory, 'x.pdf'), templatePath: null },
+        () => {},
+      ),
+    ).rejects.toThrow('one document')
+  })
+
+  test('names each PDF after its source', async () => {
     const source = writeDocument(
       'essay.md',
       '---\ntitle: Essay\n---\nOne two three\n',
@@ -50,11 +69,23 @@ describe('buildDocuments', () => {
     expect(outcome).toEqual({
       ok: true,
       result: {
-        outputPath: path.join(directory, 'dist', 'essay.pdf'),
+        outputPath: path.join(directory, 'essay.pdf'),
         sourcePath: source,
         wordCount: 3,
       },
     })
+  })
+
+  test('writes each PDF beside its source by default', async () => {
+    const source = writeDocument('essay.md', '---\ntitle: Essay\n---\n')
+    const [outcome] = await buildDocuments(
+      [source],
+      { compile, output: null, templatePath: null },
+      () => {},
+    )
+    expect(outcome?.ok && outcome.result.outputPath).toBe(
+      path.join(directory, 'essay.pdf'),
+    )
   })
 
   test('fills the bundled template by default', async () => {
@@ -80,7 +111,7 @@ describe('buildDocuments', () => {
         writeDocument('invalid.md', '# No frontmatter\n'),
         writeDocument('good.md', '---\ntitle: Good\n---\n'),
       ],
-      { compile, outputDirectory: directory, templatePath: null },
+      { compile, output: null, templatePath: null },
       (outcome) => reported.push(outcome),
     )
     expect(outcomes.map((outcome) => outcome.ok)).toEqual([false, false, true])
