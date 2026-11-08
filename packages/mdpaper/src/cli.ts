@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import { spawn } from 'bun'
 import { type BuildOutcome, buildDocuments } from './lib/build'
 import { cancel, isCancel, log, multiselect } from '@clack/prompts'
 import { discoverDocuments } from './lib/inputs'
@@ -10,6 +11,7 @@ type CliOptions = Readonly<{
   inputs: readonly string[]
   output: string | null
   templatePath: string | null
+  open: boolean
 }>
 
 const displayPath = (filename: string): string =>
@@ -39,6 +41,20 @@ const selectDocuments = (inputs: readonly string[]): Promise<string[]> => {
   })
 }
 
+const openCommand = (): string =>
+  process.platform === 'darwin' ? 'open' : 'xdg-open'
+
+const openPdf = (filename: string): void => {
+  try {
+    spawn([openCommand(), filename], {
+      stderr: 'ignore',
+      stdout: 'ignore',
+    }).unref()
+  } catch (error) {
+    log.warn(`Could not open ${displayPath(filename)}: ${String(error)}`)
+  }
+}
+
 const reportOutcome = (outcome: BuildOutcome): void => {
   if (outcome.ok) {
     const { outputPath: destination, wordCount } = outcome.result
@@ -55,7 +71,13 @@ const buildSelectedDocuments = (
   if (files.length === 0) {
     return Promise.resolve()
   }
-  return buildDocuments(files, options, reportOutcome).then((outcomes) => {
+  const onOutcome = (outcome: BuildOutcome): void => {
+    reportOutcome(outcome)
+    if (options.open && outcome.ok) {
+      openPdf(outcome.result.outputPath)
+    }
+  }
+  return buildDocuments(files, options, onOutcome).then((outcomes) => {
     const failures = outcomes.filter((outcome) => !outcome.ok)
     if (failures.length > 0)
       throw new Error(`${failures.length} document(s) failed to build.`)
@@ -73,13 +95,14 @@ const parseOptions = (): CliOptions | false => {
     args: process.argv.slice(2),
     options: {
       help: { short: 'h', type: 'boolean' },
+      open: { type: 'boolean' },
       output: { short: 'o', type: 'string' },
       template: { type: 'string' },
     },
   })
   if (values.help) {
     process.stdout.write(
-      'Usage: mdpaper build [files or folders...] [-o, --output paper.pdf] [--template paper.tex]\n',
+      'Usage: mdpaper build [files or folders...] [-o, --output paper.pdf] [--template paper.tex] [--open]\n',
     )
     return false
   }
@@ -88,6 +111,7 @@ const parseOptions = (): CliOptions | false => {
   )
   return {
     inputs,
+    open: values.open ?? false,
     output: values.output ? path.resolve(values.output) : null,
     templatePath: values.template ? path.resolve(values.template) : null,
   }
