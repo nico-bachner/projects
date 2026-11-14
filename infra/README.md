@@ -9,7 +9,7 @@ Every setting is declared, defaults included. State lives under `terraform.tfsta
 
 ## CI
 
-The `Infra` workflow plans on pull requests that touch `infra/`, and the `Deploy` workflow applies on `main`. Both read every credential from the Actions secrets that `github.tf` manages.
+The `Infra` workflow runs on every pull request, and its `plan` check is required to merge. Its `changes` job diffs the pull request against its base; when nothing under `infra/`, `.github/workflows/infra.yml` or `.github/workflows/deploy.yml` changed, `plan` passes without running OpenTofu. Otherwise, or when the diff fails, it plans, queued behind any other plan or deploy. The `Deploy` workflow applies on `main`. Both read every credential from the Actions secrets that `github.tf` manages.
 
 ## Running locally
 
