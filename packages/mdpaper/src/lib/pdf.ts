@@ -13,6 +13,7 @@ import { binaryPath } from 'node-tectonic'
 export const compilePdf = (
   source: string,
   outputPath: string,
+  verbose = false,
 ): Promise<void> => {
   const embeddedEngine = (Bun.embeddedFiles as readonly File[]).find(
     (file) => file.name.endsWith('/tectonic') || file.name === 'tectonic',
@@ -39,12 +40,20 @@ export const compilePdf = (
         [engine, sourcePath, '--outdir', temporaryDirectory],
         {
           cwd: temporaryDirectory,
-          stderr: 'inherit',
-          stdout: 'inherit',
+          stderr: verbose ? 'inherit' : 'pipe',
+          stdout: verbose ? 'inherit' : 'pipe',
         },
       )
       if (compilation.exitCode !== 0) {
-        throw new Error(`Tectonic exited with status ${compilation.exitCode}.`)
+        const errors = [compilation.stdout, compilation.stderr]
+          .flatMap((output) => output?.toString().split('\n') ?? [])
+          .map(
+            (line) => /^error: (?:[^:\s]+\.tex:\d+: )?(.*)$/u.exec(line)?.[1],
+          )
+          .filter((message) => message && !message.startsWith('halted on'))
+        throw new Error(
+          ['LaTeX could not typeset the document.', ...errors].join('\n'),
+        )
       }
       renameSync(path.join(temporaryDirectory, 'essay.pdf'), outputPath)
     } finally {
