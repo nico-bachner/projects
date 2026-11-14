@@ -101,6 +101,18 @@ describe('buildDocuments', () => {
     )
   })
 
+  test('curls straight quotes', async () => {
+    await build([
+      writeDocument(
+        'essay.md',
+        '---\ntitle: Essay\n---\nShe said "What we *may* be" and \'maybe\' (\"so\") it\'s **"bold"**.\n',
+      ),
+    ])
+    expect(Object.values(compiled)[0]).toContain(
+      'She said \u201CWhat we \\textit{may} be\u201D and \u2018maybe\u2019 (\u201Cso\u201D) it\u2019s \\textbf{\u201Cbold\u201D}.',
+    )
+  })
+
   test('counts words in each section', async () => {
     const [outcome] = await build([
       writeDocument(
