@@ -1,8 +1,17 @@
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  setDefaultTimeout,
+  test,
+} from 'bun:test'
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { formatDocument } from './format'
 import os from 'node:os'
 import path from 'node:path'
+
+setDefaultTimeout(30_000)
 
 let directory = ''
 

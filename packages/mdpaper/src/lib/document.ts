@@ -1,4 +1,4 @@
-import * as Bun from 'bun'
+import { markdown as bunMarkdown } from 'bun'
 import { escapeTex } from './tex'
 import { fillTemplate } from './template'
 import { parseDocument } from './metadata'
@@ -57,7 +57,7 @@ const renderHeading = (content: string, level: number): string => {
 }
 
 const renderMarkdown = (markdown: string): string => {
-  return Bun.markdown.render(markdown, {
+  return bunMarkdown.render(markdown, {
     blockquote: (content) => wrapEnvironment('quote', content),
     code: () => rejectMarkdown('code blocks'),
     codespan: (content) => `\\texttt{${escapeTex(content)}}`,
@@ -127,7 +127,7 @@ const countWords = (text: string): number =>
   text.split(/\s+/u).filter((word) => /[\p{L}\p{N}]/u.test(word)).length
 
 const countSections = (markdown: string): Omit<Section, 'counted'>[] => {
-  const renderedText = Bun.markdown.render(markdown, {
+  const renderedText = bunMarkdown.render(markdown, {
     code: () => '',
     heading: (content, { level }) =>
       `${headingMarker}${level} ${content.trim()}\n`,
