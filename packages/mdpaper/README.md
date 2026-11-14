@@ -78,6 +78,7 @@ mdpaper build paper.md --output final.pdf --template custom.tex
 | ---------------- | ----------------- | ------------------------------------------------------------------------ |
 | `--output`, `-o` | Beside the source | PDF path, relative to the current directory. Only for a single document. |
 | `--template`     | Bundled template  | Custom LaTeX template.                                                   |
+| `--open`         | Off               | Open each built PDF in the default viewer.                               |
 | `--help`, `-h`   |                   | Show usage.                                                              |
 
 PDFs are named after their source files and written beside them: `notes/paper.md` becomes `notes/paper.pdf`, unless `--output` names another path. Documents whose PDFs would share a path are rejected. Successful builds replace existing PDFs; failed builds preserve the previous output. Reported word counts are approximate and exclude frontmatter.
