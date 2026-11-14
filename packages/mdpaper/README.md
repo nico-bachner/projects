@@ -108,6 +108,6 @@ Currently unsupported: images, tables, code blocks, raw HTML, strikethrough, tas
 - The bundled Tectonic binary is copied to a temporary directory before it runs, because the operating system cannot execute a file embedded in the Markdown Paper executable.
 - Bare URLs become `\url` links, and the default template loads `xurl`, so long URLs wrap instead of overflowing the margin.
 - Straight quotes become curly ones. Each text fragment arrives separately from the Markdown renderer, so a quote is judged by its neighbours: after a space or bracket, or at a fragment's start before text, a double quote opens; a single quote opens only after a space or bracket, so apostrophes after emphasis stay apostrophes.
-- `fmt` runs the executable as Bun itself (`BUN_BE_BUN=1`) with `bun fmt --no-script`, one document at a time; `--no-script` stops a `fmt` script in the user's `package.json` from running instead.
+- `fmt` runs the executable as Bun itself (`BUN_BE_BUN=1`) with `bun fmt --no-script`, one document at a time; `--no-script` stops a `fmt` script in the user's `package.json` from running instead. Its tests allow 30 seconds each, because the first formatter process can take over five seconds to start on a CI runner.
 - A failed build leaves any existing PDF in place.
 - The release workflow passes the bare version as `tag-name` to bump-homebrew-formula-action, which reads the formula version from it.
