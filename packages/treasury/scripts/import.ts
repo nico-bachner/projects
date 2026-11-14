@@ -7,7 +7,12 @@ import * as z from 'zod'
 
 import { Overrides, parseLedger } from '../src/ledger'
 import { migrationFiles } from '../src/migrations'
-import { matchReceipts, parseReceiptName } from '../src/receipts'
+import {
+  matchReceipts,
+  receiptExtension,
+  receiptTypes,
+  type Extension,
+} from '../src/receipts'
 import { report } from '../src/report'
 import { importSql, type StoredReceipt } from '../src/sql'
 
@@ -45,14 +50,23 @@ const files = readdirSync(receiptsDir, { withFileTypes: true })
   .map((entry) => entry.name)
 const { matches, anomalies } = matchReceipts(ledger.expenses, files, overrides)
 
-const receipts = new Map<number, StoredReceipt & { file: string }>()
+const receipts = new Map<
+  number,
+  StoredReceipt & { file: string; extension: Extension }
+>()
 for (const [line, file] of matches) {
+  const extension = receiptExtension(file)
+  if (!extension) {
+    throw new Error(`Unsupported receipt file type: ${file}`)
+  }
   const contents = readFileSync(path.join(receiptsDir, file))
   const sha256 = new Bun.CryptoHasher('sha256').update(contents).digest('hex')
-  const extension =
-    parseReceiptName(file)?.extension ??
-    path.extname(file).slice(1).toLowerCase()
-  receipts.set(line, { file, sha256, key: `receipts/${sha256}.${extension}` })
+  receipts.set(line, {
+    file,
+    extension,
+    sha256,
+    key: `receipts/${sha256}.${extension}`,
+  })
 }
 
 const sql = importSql(ledger.expenses, receipts)
@@ -101,12 +115,13 @@ if (values.upload) {
     secretAccessKey: env.data.S3_SECRET_ACCESS_KEY,
     endpoint: env.data.S3_ENDPOINT,
   })
-  for (const { file, key } of receipts.values()) {
+  for (const { file, key, extension } of receipts.values()) {
     if (await bucket.exists(key)) {
       continue
     }
-    const source = Bun.file(path.join(receiptsDir, file))
-    await bucket.write(key, source, { type: source.type })
+    await bucket.write(key, Bun.file(path.join(receiptsDir, file)), {
+      type: receiptTypes[extension],
+    })
     console.log(`Uploaded ${file} to ${key}.`)
   }
 }

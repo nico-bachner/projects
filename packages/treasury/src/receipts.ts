@@ -1,25 +1,35 @@
 import type { Anomaly, Expense, Overrides } from './ledger'
 
+export const receiptTypes = {
+  pdf: 'application/pdf',
+  png: 'image/png',
+} as const
+
+export type Extension = keyof typeof receiptTypes
+
 export type Receipt = {
   file: string
   date: string
   item: string
-  extension: 'jpg' | 'pdf' | 'png'
+  extension: Extension
 }
 
-const filenamePattern = /^(\d{4}-\d{2}-\d{2}) (.+)\.(jpg|pdf|png)$/iu
+const filenamePattern = /^(\d{4}-\d{2}-\d{2}) (.+)\.([a-z]+)$/iu
+
+export const receiptExtension = (file: string): Extension | undefined => {
+  const extension = file.split('.').at(-1)?.toLowerCase()
+  return extension && extension in receiptTypes
+    ? (extension as Extension)
+    : undefined
+}
 
 export const parseReceiptName = (file: string): Receipt | undefined => {
   const match = filenamePattern.exec(file)
-  if (!match) {
+  const extension = receiptExtension(file)
+  if (!match || !extension) {
     return undefined
   }
-  return {
-    file,
-    date: match[1]!,
-    item: match[2]!,
-    extension: match[3]!.toLowerCase() as Receipt['extension'],
-  }
+  return { file, date: match[1]!, item: match[2]!, extension }
 }
 
 const tokens = (text: string): Set<string> =>
@@ -90,7 +100,8 @@ export const matchReceipts = (
       anomalies.push({
         file,
         kind: 'unmatched-receipt',
-        message: 'Name is not "YYYY-MM-DD Item purchased.(png|pdf|jpg)".',
+        message:
+          'Name is not "YYYY-MM-DD Item purchased.(pdf|png)"; convert other formats first.',
       })
       continue
     }

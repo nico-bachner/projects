@@ -27,12 +27,16 @@ Amounts are integer cents. Category, discipline, status and review decision are 
 
 ## Importing the ledger
 
-The import takes the ledger exported from Google Sheets as CSV and a folder of the receipts downloaded from Drive, named `YYYY-MM-DD Item purchased.(png|pdf|jpg)`. Neither belongs in this public repository, and neither does the overrides file, since all three name members.
+The import takes the ledger exported from Google Sheets as CSV and a folder of the receipts downloaded from Drive, named `YYYY-MM-DD Item purchased.pdf` or `.png`, in any letter case. Receipts are stored only as PDF or PNG, so the batch PDF for SUS can embed them without conversion. Convert other formats first, for example on macOS:
+
+````sh
+sips -s format png "2026-01-01 Torches.heic" --out "2026-01-01 Torches.png"
+``` Neither belongs in this public repository, and neither does the overrides file, since all three name members.
 
 ```sh
 cd packages/treasury
 bun run import ledger.csv receipts/ --overrides overrides.json
-```
+````
 
 It writes `import/import.sql` and `import/report.md`, after loading the SQL twice into an in-memory copy of the schema to check that it applies and can be re-run. Read the report, add overrides, and repeat until it is clean.
 

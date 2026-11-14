@@ -16,16 +16,22 @@ describe('parseReceiptName', () => {
     })
     expect(parseReceiptName('scan.pdf')).toBeUndefined()
   })
+
+  test('accepts only PDF and PNG, in any letter case', () => {
+    expect(parseReceiptName('2026-01-01 Torches.PNG')?.extension).toBe('png')
+    expect(parseReceiptName('2026-01-01 Torches.jpg')).toBeUndefined()
+    expect(parseReceiptName('2026-01-01 Torches.webp')).toBeUndefined()
+  })
 })
 
 describe('matchReceipts', () => {
   test('matches on date, using vendor and description to break ties', () => {
     const { matches } = matchReceipts(expenses, [
       '2026-02-06 Paddle Victoria Team Entry.pdf',
-      '2026-04-01 Fuel.jpg',
+      '2026-04-01 Fuel.png',
     ])
     expect(matches.get(5)).toBe('2026-02-06 Paddle Victoria Team Entry.pdf')
-    expect(matches.get(9)).toBe('2026-04-01 Fuel.jpg')
+    expect(matches.get(9)).toBe('2026-04-01 Fuel.png')
   })
 
   test('falls back to nearby dates', () => {
@@ -54,7 +60,7 @@ describe('matchReceipts', () => {
 
   test('reports a second receipt for a line that already has one', () => {
     const { matches, anomalies } = matchReceipts(expenses, [
-      '2026-04-01 Fuel.jpg',
+      '2026-04-01 Fuel.png',
       '2026-04-01 Fuel receipt.pdf',
     ])
     expect(matches.size).toBe(1)
