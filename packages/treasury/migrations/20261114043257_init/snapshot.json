@@ -1,0 +1,508 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "id": "aa4f8468-da52-4f7e-a4b7-89dd55ca760d",
+  "prevIds": ["00000000-0000-0000-0000-000000000000"],
+  "ddl": [
+    {
+      "name": "batches",
+      "entityType": "tables"
+    },
+    {
+      "name": "expenses",
+      "entityType": "tables"
+    },
+    {
+      "name": "members",
+      "entityType": "tables"
+    },
+    {
+      "name": "reviews",
+      "entityType": "tables"
+    },
+    {
+      "table": "batches",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "batches",
+      "name": "created_at",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "batches",
+      "name": "pdf_key",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "batches",
+      "name": "submitted_at",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "batches",
+      "name": "reimbursed_at",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "member_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "date",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "amount_cents",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "vendor",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "description",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "category",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "discipline",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "receipt_key",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "receipt_sha256",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "status",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "batch_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "source",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "import_key",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "discord_thread_id",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "created_at",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "members",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "members",
+      "name": "name",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "members",
+      "name": "discord_id",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "reviews",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "reviews",
+      "name": "expense_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "reviews",
+      "name": "member_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "reviews",
+      "name": "decision",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "reviews",
+      "name": "note",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "reviews",
+      "name": "created_at",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "(strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "expenses",
+      "name": "expenses_status",
+      "columns": [
+        {
+          "value": "status",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "expenses",
+      "name": "expenses_receipt_sha256",
+      "columns": [
+        {
+          "value": "receipt_sha256",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "reviews",
+      "name": "reviews_expense_id",
+      "columns": [
+        {
+          "value": "expense_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "expenses",
+      "name": "fk_expenses_member_id_members_id_fk",
+      "columns": ["member_id"],
+      "tableTo": "members",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "expenses",
+      "name": "fk_expenses_batch_id_batches_id_fk",
+      "columns": ["batch_id"],
+      "tableTo": "batches",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "reviews",
+      "name": "fk_reviews_expense_id_expenses_id_fk",
+      "columns": ["expense_id"],
+      "tableTo": "expenses",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "reviews",
+      "name": "fk_reviews_member_id_members_id_fk",
+      "columns": ["member_id"],
+      "tableTo": "members",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "batches",
+      "name": "batches_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "expenses",
+      "name": "expenses_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "members",
+      "name": "members_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "reviews",
+      "name": "reviews_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "expenses",
+      "name": "expenses_import_key_unique",
+      "columns": ["import_key"],
+      "nameExplicit": false,
+      "entityType": "uniques"
+    },
+    {
+      "table": "members",
+      "name": "members_name_unique",
+      "columns": ["name"],
+      "nameExplicit": false,
+      "entityType": "uniques"
+    },
+    {
+      "table": "members",
+      "name": "members_discord_id_unique",
+      "columns": ["discord_id"],
+      "nameExplicit": false,
+      "entityType": "uniques"
+    },
+    {
+      "table": "expenses",
+      "name": "expenses_date",
+      "value": "\"date\" GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'",
+      "entityType": "checks"
+    },
+    {
+      "table": "expenses",
+      "name": "expenses_amount_cents",
+      "value": "\"amount_cents\" > 0",
+      "entityType": "checks"
+    },
+    {
+      "table": "expenses",
+      "name": "expenses_category",
+      "value": "category IN ('Competitions', 'Events', 'Gear', 'Merchandise', 'Trips', 'Website')",
+      "entityType": "checks"
+    },
+    {
+      "table": "expenses",
+      "name": "expenses_discipline",
+      "value": "discipline IN ('Flatwater', 'Polo', 'Whitewater')",
+      "entityType": "checks"
+    },
+    {
+      "table": "expenses",
+      "name": "expenses_status",
+      "value": "status IN ('submitted', 'changes_requested', 'approved', 'rejected', 'signed_off', 'submitted_to_sus', 'reimbursed')",
+      "entityType": "checks"
+    },
+    {
+      "table": "expenses",
+      "name": "expenses_source",
+      "value": "source IN ('import', 'discord')",
+      "entityType": "checks"
+    },
+    {
+      "table": "reviews",
+      "name": "reviews_decision",
+      "value": "decision IN ('approve', 'request_changes', 'reject', 'sign_off')",
+      "entityType": "checks"
+    },
+    {
+      "table": "reviews",
+      "name": "reviews_note",
+      "value": "\"decision\" IN ('approve', 'sign_off') OR \"note\" IS NOT NULL",
+      "entityType": "checks"
+    }
+  ],
+  "renames": []
+}

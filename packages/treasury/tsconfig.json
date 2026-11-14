@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "preserve",
+    "skipLibCheck": true,
     "types": ["bun"]
   }
 }

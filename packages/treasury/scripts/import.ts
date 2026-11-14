@@ -5,6 +5,7 @@ import { parseArgs } from 'node:util'
 import { S3Client } from 'bun'
 
 import { parseLedger, type Overrides } from '../src/ledger'
+import { migrationFiles } from '../src/migrations'
 import { matchReceipts, parseReceiptName } from '../src/receipts'
 import { report } from '../src/report'
 import { importSql, type StoredReceipt } from '../src/sql'
@@ -48,9 +49,8 @@ for (const [line, file] of matches) {
 
 const sql = importSql(ledger.expenses, receipts)
 const database = new Database(':memory:', { strict: true })
-const migrations = path.join(import.meta.dir, '../migrations')
-for (const migration of readdirSync(migrations).toSorted()) {
-  database.run(readFileSync(path.join(migrations, migration), 'utf8'))
+for (const migration of migrationFiles()) {
+  database.run(readFileSync(migration, 'utf8'))
 }
 database.run(sql)
 database.run(sql)

@@ -8,10 +8,16 @@ This package so far holds the database schema and the one-off import of the old 
 
 The `treasury` D1 database and R2 bucket are declared in [infra](../../infra/README.md). D1 is the source of truth and R2 holds receipts under `receipts/<sha256>.<ext>`. Backups are D1's 30-day point-in-time restore; anything older can be rebuilt from the receipts and the batches sent to SUS.
 
-Schema changes are numbered SQL files in `migrations`. The Treasury workflow applies new ones to D1 when they reach `main`, and D1 records which have run. To try them against a local copy of the database:
+The schema is defined in [`src/schema.ts`](src/schema.ts) with [Drizzle](https://orm.drizzle.team), which is the place to read and change it. After changing it, generate a migration and commit both:
 
 ```sh
 cd packages/treasury
+bun run migration --name add_receipt_pages
+```
+
+Drizzle Kit compares the schema with the latest snapshot and writes a new folder to `migrations`, named with a timestamp and holding `migration.sql` and `snapshot.json`; `wrangler.jsonc` points Wrangler at those files. Read it before committing: SQLite cannot change a column's checked values in place, so such changes rebuild the table and copy every row. A test fails when the schema has changes without a migration. The Treasury workflow applies new migrations to D1 when they reach `main`, and D1 records which have run. To try them against a local copy of the database:
+
+```sh
 bunx wrangler d1 migrations apply treasury --local
 ```
 

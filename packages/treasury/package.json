@@ -2,10 +2,15 @@
   "name": "treasury",
   "private": true,
   "scripts": {
-    "import": "bun scripts/import.ts"
+    "import": "bun scripts/import.ts",
+    "migration": "drizzle-kit generate"
   },
   "devDependencies": {
     "@types/bun": "catalog:",
+    "drizzle-kit": "^1.0.0-rc.5",
     "wrangler": "^4.153.0"
+  },
+  "dependencies": {
+    "drizzle-orm": "^1.0.0-rc.5"
   }
 }

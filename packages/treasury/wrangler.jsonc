@@ -6,6 +6,8 @@
       "binding": "DB",
       "database_name": "treasury",
       "database_id": "ff934317-6a1c-4481-9b95-cd028536de12",
+      "migrations_dir": "migrations",
+      "migrations_pattern": "migrations/*/migration.sql",
     },
   ],
 }

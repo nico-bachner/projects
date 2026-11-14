@@ -1,17 +1,16 @@
 import { Database } from 'bun:sqlite'
 import { expect, test } from 'bun:test'
-import { readdirSync, readFileSync } from 'node:fs'
-import path from 'node:path'
+import { readFileSync } from 'node:fs'
 
 import { ledgerCsv } from './fixtures'
 import { parseLedger } from './ledger'
+import { migrationFiles } from './migrations'
 import { importSql } from './sql'
 
 const migrate = (): Database => {
   const database = new Database(':memory:', { strict: true })
-  const migrations = path.join(import.meta.dir, '../migrations')
-  for (const migration of readdirSync(migrations).toSorted()) {
-    database.run(readFileSync(path.join(migrations, migration), 'utf8'))
+  for (const migration of migrationFiles()) {
+    database.run(readFileSync(migration, 'utf8'))
   }
   return database
 }
