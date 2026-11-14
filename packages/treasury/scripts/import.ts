@@ -3,8 +3,9 @@ import { mkdirSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { parseArgs } from 'node:util'
 import { S3Client } from 'bun'
+import * as z from 'zod'
 
-import { parseLedger, type Overrides } from '../src/ledger'
+import { Overrides, parseLedger } from '../src/ledger'
 import { migrationFiles } from '../src/migrations'
 import { matchReceipts, parseReceiptName } from '../src/receipts'
 import { report } from '../src/report'
@@ -28,9 +29,16 @@ if (!ledgerPath || !receiptsDir) {
   process.exit(1)
 }
 
-const overrides: Overrides = values.overrides
-  ? JSON.parse(readFileSync(values.overrides, 'utf8'))
-  : {}
+const parsedOverrides = Overrides.safeParse(
+  values.overrides ? JSON.parse(readFileSync(values.overrides, 'utf8')) : {},
+)
+if (!parsedOverrides.success) {
+  console.error(
+    `Invalid overrides file:\n${z.prettifyError(parsedOverrides.error)}`,
+  )
+  process.exit(1)
+}
+const overrides = parsedOverrides.data
 const ledger = parseLedger(readFileSync(ledgerPath, 'utf8'), overrides)
 const files = readdirSync(receiptsDir, { withFileTypes: true })
   .filter((entry) => entry.isFile() && !entry.name.startsWith('.'))
@@ -74,7 +82,25 @@ console.log(
 )
 
 if (values.upload) {
-  const bucket = new S3Client({ bucket: 'treasury' })
+  const env = z
+    .object({
+      S3_ACCESS_KEY_ID: z.string().min(1),
+      S3_SECRET_ACCESS_KEY: z.string().min(1),
+      S3_ENDPOINT: z.url(),
+    })
+    .safeParse(process.env)
+  if (!env.success) {
+    console.error(
+      `Uploading needs an R2 key for the treasury bucket:\n${z.prettifyError(env.error)}`,
+    )
+    process.exit(1)
+  }
+  const bucket = new S3Client({
+    bucket: 'treasury',
+    accessKeyId: env.data.S3_ACCESS_KEY_ID,
+    secretAccessKey: env.data.S3_SECRET_ACCESS_KEY,
+    endpoint: env.data.S3_ENDPOINT,
+  })
   for (const { file, key } of receipts.values()) {
     if (await bucket.exists(key)) {
       continue

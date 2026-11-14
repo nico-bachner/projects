@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { ledgerCsv } from './fixtures'
-import { parseLedger } from './ledger'
+import { Overrides, parseLedger } from './ledger'
 
 describe('parseLedger', () => {
   test('normalises amounts, dates, disciplines and statuses', () => {
@@ -69,5 +69,28 @@ describe('parseLedger', () => {
 
   test('rejects an unexpected header', () => {
     expect(() => parseLedger('Date,Amount\n')).toThrow('ledger header')
+  })
+})
+
+describe('Overrides', () => {
+  test('accepts row and receipt overrides', () => {
+    expect(
+      Overrides.parse({
+        rows: { '4': { skip: true }, '3': { status: 'approved' } },
+        receipts: { 'a.pdf': 12, 'b.png': null },
+      }),
+    ).toBeDefined()
+  })
+
+  test('rejects misspelt keys and unknown statuses', () => {
+    expect(Overrides.safeParse({ rows: { '4': { skpi: true } } }).success).toBe(
+      false,
+    )
+    expect(
+      Overrides.safeParse({ rows: { '4': { status: 'paid' } } }).success,
+    ).toBe(false)
+    expect(Overrides.safeParse({ receipts: { 'a.pdf': 0 } }).success).toBe(
+      false,
+    )
   })
 })

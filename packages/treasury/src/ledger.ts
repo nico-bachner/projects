@@ -1,3 +1,5 @@
+import * as z from 'zod'
+
 import { parseCsv } from './csv'
 
 export const categories = [
@@ -21,9 +23,13 @@ export const statuses = [
   'reimbursed',
 ] as const
 
-export type Category = (typeof categories)[number]
-export type Discipline = (typeof disciplines)[number]
-export type Status = (typeof statuses)[number]
+export const Category = z.enum(categories)
+export const Discipline = z.enum(disciplines)
+export const Status = z.enum(statuses)
+
+export type Category = z.infer<typeof Category>
+export type Discipline = z.infer<typeof Discipline>
+export type Status = z.infer<typeof Status>
 
 export type Expense = {
   line: number
@@ -51,21 +57,48 @@ export type Anomaly = {
   message: string
 }
 
-export type RowOverride = {
-  skip?: boolean
-  status?: Status
-  date?: string
-  payer?: string
-  amount?: string
-  category?: string
-  discipline?: string
-  vendor?: string
-  description?: string
-}
+const RowOverride = z.strictObject({
+  skip: z.boolean().optional(),
+  status: Status.optional(),
+  date: z.string().optional(),
+  payer: z.string().optional(),
+  amount: z.string().optional(),
+  category: z.string().optional(),
+  discipline: z.string().optional(),
+  vendor: z.string().optional(),
+  description: z.string().optional(),
+})
 
-export type Overrides = {
-  rows?: Record<string, RowOverride>
-  receipts?: Record<string, number | null>
+export const Overrides = z.strictObject({
+  rows: z.record(z.string().regex(/^\d+$/u), RowOverride).optional(),
+  receipts: z.record(z.string(), z.int().positive().nullable()).optional(),
+})
+
+export type Overrides = z.infer<typeof Overrides>
+
+const LedgerRow = z.object({
+  date: z.iso.date(),
+  payer: z.string().min(1),
+  amountCents: z
+    .string()
+    .regex(/^\$?(\d{1,3}(?:,\d{3})*|\d+)\.\d{2}$/u)
+    .transform((value) => Number(value.replace(/[$,.]/gu, ''))),
+  category: Category,
+  discipline: z
+    .literal('N/A')
+    .transform(() => null)
+    .or(Discipline),
+  vendor: z.string().min(1),
+  description: z.string().min(1),
+  status: z
+    .enum(['Reimbursed', 'Pending'])
+    .transform((value) => (value === 'Reimbursed' ? 'reimbursed' : 'submitted'))
+    .or(Status),
+})
+
+const fieldNames: Record<string, string> = {
+  amountCents: 'amount',
+  status: 'reimbursed status',
 }
 
 const header = [
@@ -89,48 +122,6 @@ const vendorCorrections: Record<string, string> = {
 const descriptionCorrections: [RegExp, string][] = [
   [/\bEssenden\b/gu, 'Essendon'],
 ]
-
-const parseAmount = (value: string): number | undefined => {
-  const match = /^\$?(\d{1,3}(?:,\d{3})*|\d+)\.(\d{2})$/u.exec(value.trim())
-  if (!match) {
-    return undefined
-  }
-  return Number(match[1]!.replaceAll(',', '')) * 100 + Number(match[2])
-}
-
-const parseDate = (
-  year: string,
-  month: string,
-  day: string,
-): string | undefined => {
-  if (![year, month, day].every((part) => /^\d+$/u.test(part))) {
-    return undefined
-  }
-  const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)))
-  if (
-    date.getUTCFullYear() !== Number(year) ||
-    date.getUTCMonth() !== Number(month) - 1 ||
-    date.getUTCDate() !== Number(day)
-  ) {
-    return undefined
-  }
-  return date.toISOString().slice(0, 10)
-}
-
-const parseStatus = (value: string): Status | undefined => {
-  if (value === 'Reimbursed') {
-    return 'reimbursed'
-  }
-  if (value === 'Pending') {
-    return 'submitted'
-  }
-  return undefined
-}
-
-const includes = <T extends string>(
-  values: readonly T[],
-  value: string,
-): value is T => (values as readonly string[]).includes(value)
 
 const dayDistance = (a: string, b: string): number =>
   Math.abs(Date.parse(a) - Date.parse(b)) / 86_400_000
@@ -166,36 +157,33 @@ export const parseLedger = (
       description = '',
       reimbursed = '',
     ] = record.map((field) => field.trim())
-    const values = {
-      date: override.date ?? parseDate(year, month, day),
+    const result = LedgerRow.safeParse({
+      date:
+        override.date ??
+        `${year.padStart(4, '0')}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`,
       payer: override.payer ?? payer,
-      amountCents: parseAmount(override.amount ?? amount),
+      amountCents: override.amount ?? amount,
       category: override.category ?? category,
       discipline: override.discipline ?? discipline,
       vendor: override.vendor ?? vendor,
       description: override.description ?? description,
-      status: override.status ?? parseStatus(reimbursed),
-    }
-    const problems = [
-      values.date ? undefined : 'date',
-      values.payer ? undefined : 'payer',
-      values.amountCents ? undefined : 'amount',
-      includes(categories, values.category) ? undefined : 'category',
-      values.discipline === 'N/A' || includes(disciplines, values.discipline)
-        ? undefined
-        : 'discipline',
-      values.vendor ? undefined : 'vendor',
-      values.description ? undefined : 'description',
-      values.status ? undefined : 'reimbursed status',
-    ].filter((problem) => problem !== undefined)
-    if (problems.length > 0) {
+      status: override.status ?? reimbursed,
+    })
+    if (!result.success) {
+      const problems = new Set(
+        result.error.issues.map(({ path: [field] }) => {
+          const name = String(field)
+          return fieldNames[name] ?? name
+        }),
+      )
       anomalies.push({
         line,
         kind: 'invalid',
-        message: `Missing or invalid ${problems.join(', ')}; not imported.`,
+        message: `Missing or invalid ${[...problems].join(', ')}; not imported.`,
       })
       return
     }
+    const values = result.data
     const correctedVendor = vendorCorrections[values.vendor] ?? values.vendor
     const correctedDescription = descriptionCorrections.reduce(
       (text, [pattern, replacement]) => text.replace(pattern, replacement),
@@ -215,15 +203,9 @@ export const parseLedger = (
     }
     expenses.push({
       line,
-      date: values.date!,
-      payer: values.payer,
-      amountCents: values.amountCents!,
-      category: values.category as Category,
-      discipline:
-        values.discipline === 'N/A' ? null : (values.discipline as Discipline),
+      ...values,
       vendor: correctedVendor,
       description: correctedDescription,
-      status: values.status!,
     })
   })
   expenses.forEach((expense, index) => {
