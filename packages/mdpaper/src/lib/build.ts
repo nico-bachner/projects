@@ -1,7 +1,7 @@
 import { compilePdf } from './pdf'
 import defaultTemplate from '../../templates/default.tex' with { type: 'text' }
 import path from 'node:path'
-import { prepareDocument } from './document'
+import { type Section, prepareDocument } from './document'
 import { readFileSync } from 'node:fs'
 
 export type Compile = (latex: string, outputPath: string) => Promise<void>
@@ -9,6 +9,7 @@ export type Compile = (latex: string, outputPath: string) => Promise<void>
 export type BuildOptions = Readonly<{
   output: string | null
   templatePath: string | null
+  wordCountPage?: boolean
   compile?: Compile
 }>
 
@@ -16,6 +17,7 @@ export type BuildResult = Readonly<{
   sourcePath: string
   outputPath: string
   wordCount: number
+  sections: readonly Section[]
 }>
 
 export type BuildOutcome =
@@ -46,15 +48,21 @@ const buildDocument = (
   template: string,
   output: string | null,
   compile: Compile,
+  wordCountPage: boolean,
 ): Promise<BuildOutcome> => {
   try {
-    const document = prepareDocument(readFileSync(sourcePath, 'utf8'), template)
+    const document = prepareDocument(
+      readFileSync(sourcePath, 'utf8'),
+      template,
+      wordCountPage,
+    )
     const destination = outputPath(sourcePath, output)
     return compile(document.latex, destination)
       .then((): BuildOutcome => ({
         ok: true,
         result: {
           outputPath: destination,
+          sections: document.sections,
           sourcePath,
           wordCount: document.wordCount,
         },
@@ -78,12 +86,16 @@ export const buildDocuments = (
     const compile = options.compile ?? compilePdf
     return Promise.all(
       files.map((file) =>
-        buildDocument(file, template, options.output, compile).then(
-          (outcome) => {
-            onOutcome(outcome)
-            return outcome
-          },
-        ),
+        buildDocument(
+          file,
+          template,
+          options.output,
+          compile,
+          options.wordCountPage ?? false,
+        ).then((outcome) => {
+          onOutcome(outcome)
+          return outcome
+        }),
       ),
     )
   })

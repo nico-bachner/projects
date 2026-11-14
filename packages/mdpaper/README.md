@@ -80,9 +80,10 @@ mdpaper build paper.md --output final.pdf --template custom.tex
 | `--template`     | Bundled template  | Custom LaTeX template.                                                   |
 | `--open`         | Off               | Open each built PDF in the default viewer.                               |
 | `--verbose`      | Off               | Show the LaTeX engine's log. Failed builds show its errors either way.   |
+| `--word-count`   | Off               | Add a final page with the word count of each section and the total.      |
 | `--help`, `-h`   |                   | Show usage.                                                              |
 
-PDFs are named after their source files and written beside them: `notes/paper.md` becomes `notes/paper.pdf`, unless `--output` names another path. Documents whose PDFs would share a path are rejected. Successful builds replace existing PDFs; failed builds preserve the previous output. Reported word counts are approximate and exclude frontmatter.
+PDFs are named after their source files and written beside them: `notes/paper.md` becomes `notes/paper.pdf`, unless `--output` names another path. Documents whose PDFs would share a path are rejected. Successful builds replace existing PDFs; failed builds preserve the previous output. Reported word counts are approximate and exclude frontmatter. Each heading is listed with the words in it and its text, including its subsections, indented by level from `##`. `--word-count` adds the same breakdown to the PDF as a table on a new final page; that page isn't counted. To leave parts of a document out of the total, put `<!-- start word count -->` and `<!-- end word count -->` on their own lines: only the text between them counts, and sections outside them are listed as not counted. Use either marker alone to leave out just the beginning, such as an essay question, or just the end, such as a bibliography. Only the first of each marker counts, and an end marker before the start marker is ignored.
 
 ## Templates and Markdown support
 

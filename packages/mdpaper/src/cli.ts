@@ -14,6 +14,7 @@ type CliOptions = Readonly<{
   templatePath: string | null
   open: boolean
   verbose: boolean
+  wordCountPage: boolean
 }>
 
 const displayPath = (filename: string): string =>
@@ -59,8 +60,18 @@ const openPdf = (filename: string): void => {
 
 const reportOutcome = (outcome: BuildOutcome): void => {
   if (outcome.ok) {
-    const { outputPath: destination, wordCount } = outcome.result
-    log.success(`${displayPath(destination)} · ${wordCount} words`)
+    const { outputPath: destination, sections, wordCount } = outcome.result
+    const breakdown = sections
+      .filter((section) => section.title !== null)
+      .map(
+        (section) =>
+          `${'  '.repeat(section.level - 2)}${section.title} · ${section.wordCount}${section.counted ? '' : ' (not counted)'}`,
+      )
+    log.success(
+      [`${displayPath(destination)} · ${wordCount} words`, ...breakdown].join(
+        '\n',
+      ),
+    )
     return
   }
   log.error(
@@ -104,6 +115,7 @@ Options:
   --template <file>      Custom LaTeX template
   --open                 Open each built PDF
   --verbose              Show the LaTeX engine's log
+  --word-count           Add a page with the word count by section
   -h, --help             Show this help
 `
 
@@ -121,6 +133,7 @@ const readArgs = () => {
         help: { short: 'h', type: 'boolean' },
         open: { type: 'boolean' },
         verbose: { type: 'boolean' },
+        'word-count': { type: 'boolean' },
         output: { short: 'o', type: 'string' },
         template: { type: 'string' },
       },
@@ -145,6 +158,7 @@ const parseOptions = (): CliOptions | false => {
     open: values.open ?? false,
     output: values.output ? path.resolve(values.output) : null,
     verbose: values.verbose ?? false,
+    wordCountPage: values['word-count'] ?? false,
     templatePath: values.template ? path.resolve(values.template) : null,
   }
 }
