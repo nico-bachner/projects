@@ -1,8 +1,24 @@
 # Treasury
 
-Reimbursement claims and approvals for the Sydney University Canoe Club. Members claim through Discord, the treasurer approves, requests changes or rejects each claim, and the president and vice president sign off daily batches that are then emailed to Sydney Uni Sport (SUS).
+Reimbursement claims and approvals for the [Sydney University Canoe Club](https://usydcanoeclub.org). Members claim club spending through Discord, signatories review each claim, and approved claims are sent to [Sydney Uni Sport](https://susf.com.au) (SUS). Terms are defined in the [glossary](GLOSSARY.md).
 
-This package so far holds the database schema and the one-off import of the old Google Sheets ledger. The Discord bot, batches and SUS emails come next.
+This package so far holds the database schema and the one-off import of the old Google Sheets ledger. The schema predates the flow below and still models expenses rather than claims and line items. The Discord bot and SUS emails come next.
+
+## Claim flow
+
+The planned flow. Steps marked HITL need a person; the rest are automated.
+
+1. **Upload (HITL, member).** The member uploads one or more receipts in Discord and writes the claim's purpose: what the spending was for, such as "Polo training BBQ". A claim can cover several receipts, such as the same kind of item bought from several stores on one day. A receipt belongs to at most one claim, so line items from one receipt can't be split across claims, and a claim cannot be made without one.
+2. **Extract.** The bot reads each receipt's line items, vendor, date and total. A file already uploaded to any claim is refused, with a pointer to that claim. A receipt that looks like the same purchase as another, from any member, with the same vendor, date and total but a different file, is flagged: the member confirms it is a different purchase, and signatories see the flag and the matching claim. The bot also flags line items that don't sum to the printed total, which usually means a misread price, a missed line, a discount or a surcharge.
+3. **Suggest.** Using the purpose, the bot suggests a category and disciplines for the claim and preselects the line items that fit it, across all its receipts.
+4. **Confirm (HITL, member).** The member is first asked whether to claim every receipt in full. If not, they pick the line items to include. They confirm the total, category and disciplines. A line item can serve several disciplines, or General for the whole club, and can take a different category or disciplines when the receipt mixes them. Disciplines are a flat list, with no sub-disciplines. A claim whose receipts serve several purposes has one purpose that names them all.
+5. **Notify.** Each signatory gets a Discord DM about the new claim, showing its purpose, total, and each receipt with its vendor and any line items left out.
+6. **Review (HITL, signatories).** Each signatory approves, requests changes or rejects, whenever they have time. A change request objects to the claim's details, such as a wrong category or an included personal item, and a fix answers it. A rejection objects to the claim itself, such as personal spending, and no fix answers it. Both need reasons, which the bot DMs to the member along with what the claim still needs, since neither alone usually ends it. A signatory can change their own review later; a member who disagrees with a rejection DMs that signatory.
+7. **Fix (HITL, member).** After a change request, the member fixes the claim. Adding a forgotten receipt to an open claim is also a fix. The same claim stays open; the fix dismisses its approvals and change requests, but not its rejections, and the signatories are notified again.
+8. **Approve.** A claim is approved once three different signatories approve it, one of them the treasurer, even if the fourth requests changes or rejects it. A claim that can no longer reach that, after the treasurer's rejection or two from the others, is rejected, and the member gets one DM with every rejection's reasons. The member also gets one DM when the claim is approved, which tells them any open change request no longer applies; approved claims can no longer be fixed. Since the treasurer's approval is always needed, the treasurer's change request holds up the claim until it is fixed or the treasurer approves anyway. Signatories may approve their own claims.
+9. **Submit (HITL, treasurer).** When the treasurer runs a Discord command, the bot emails every approved claim not yet submitted to SUS as one batch, so SUS isn't sent an email per claim. SUS cannot refuse them. Submitting counts as reimbursement: members are not notified, since their bank tells them. A member whose money never arrives escalates to the treasurer.
+
+Out of scope for now: claims without a receipt, and grouping several members' claims for one event.
 
 ## Storage
 
