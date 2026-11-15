@@ -32,6 +32,10 @@ Lefthook runs them before commits and builds every package before pushes. CI run
 - Code has no comments. Anything that needs explaining goes in the relevant README.
 - Configs use platform and library defaults where possible and omit settings that match them. Infrastructure is the exception: OpenTofu declares every setting, defaults included.
 
+## Domain
+
+Before naming a domain concept in code, docs, tests or a pull request, read the package's `GLOSSARY.md`, listed in [GLOSSARY-MAP.md](GLOSSARY-MAP.md), and use its terms, never the ones it says to avoid. Glossaries are the only place terms are defined. Decisions live in `docs/adr/`, at the root for the workspace and in a package for that package; surface any conflict with one instead of overriding it.
+
 ## Agents
 
 Agents MAY:
